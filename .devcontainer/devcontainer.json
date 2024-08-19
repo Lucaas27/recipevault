@@ -1,9 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
 {
-	"name": "Docker from Docker Compose",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
+	"name": "Workspace",
+	"dockerComposeFile": "docker-compose.devcontainer.yml",
+	"service": "dev-container",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	// Use this environment variable if you need to bind mount your local source code into a new container.
 	"remoteEnv": {
@@ -41,11 +41,21 @@
 			]
 		}
 	},
-	"postCreateCommand": "cd recipevault.API/ && pre-commit install --hook-type commit-msg",
+	/**
+	 * Specifies the post-create command to be executed after the creation of the dev container.
+	 * This command is responsible for setting up HTTPS certificates, trusting the certificates, and installing a pre-commit hook.
+	 * The command is executed in the context of the container.
+	 */
+	"postCreateCommand": "cd recipevault.API &&  pre-commit install --hook-type commit-msg",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "docker --version",
+	"forwardPorts": [
+		5000,
+		5001,
+		8080
+	],
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	"remoteUser": "root"
+	"remoteUser": "root",
+	"mounts": [
+		"source=~/.aspnet/https,target=/https,type=bind,consistency=cached"
+	]
 }

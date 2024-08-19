@@ -4,7 +4,8 @@ FROM mcr.microsoft.com/devcontainers/base:bullseye
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
+
 # Install Python and pip
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
-    pip3 install pre-commit
+RUN sudo apt-get update && \
+    sudo apt-get install -y python3 python3-pip && \
+    sudo pip3 install pre-commit
