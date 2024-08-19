@@ -1,8 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-
+# Use the non-root user
 USER app
+
+
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
 WORKDIR /src
@@ -12,7 +14,10 @@ RUN dotnet restore "recipevault.API/recipevault.API.csproj"
 # Copy the remaining files and build the application
 COPY . .
 WORKDIR "/src/recipevault.API"
+# Add dotnet tools to the path
+ENV PATH="$PATH:/root/.dotnet/tools"
 RUN dotnet build "recipevault.API.csproj" -c $configuration -o /app/build
+
 
 FROM build AS publish
 ARG configuration=Release
