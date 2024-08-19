@@ -10,16 +10,18 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:${APP_PORT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
     depends_on:
-      - postgres
+      - db
+    ports:
+      - ${APP_PORT}:${APP_PORT}
     deploy:
       resources:
         limits:
           cpus: '0.50'
           memory: 512M
 
-  postgres:
+  db:
     image: postgres:latest
     environment:
       POSTGRES_DB: ${DB_NAME}
