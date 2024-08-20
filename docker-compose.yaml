@@ -9,7 +9,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:${APP_PORT}
-      - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=${DB_HOST:-db};Database=${DB_NAME:-recipevault};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
     depends_on:
       db:
         condition: service_healthy
