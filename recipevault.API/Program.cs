@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using recipevault.API.Data;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -12,7 +14,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString("DefaultConnection"), name: "PostgreSQL");
 
 var app = builder.Build();
 
@@ -33,6 +35,23 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-app.UseHealthChecks("/health");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var response = new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description
+            })
+        };
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
 
 app.Run();
