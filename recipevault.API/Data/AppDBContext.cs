@@ -20,7 +20,7 @@ namespace recipevault.API.Data
         {
             // Configure the one-to-many relationship between User and Recipe
             modelBuilder.Entity<Recipe>()
-                .HasOne(r => r.Owner)  // Recipe has one Owner
+                .HasOne(r => r.User)  // Recipe has one Owner
                 .WithMany(u => u.RecipesCreated)  // User can create many Recipes
                 .HasForeignKey(r => r.UserId)  // The foreign key in the Recipe entity
                 .OnDelete(DeleteBehavior.Cascade);  // Optional: Cascade delete

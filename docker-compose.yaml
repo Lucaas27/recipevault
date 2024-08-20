@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   api:
-    image: recipevault-api:latest
     build:
       context: .
       dockerfile: recipevault.API/Dockerfile
@@ -12,7 +11,8 @@ services:
       - ASPNETCORE_URLS=http://+:${APP_PORT}
       - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - ${APP_PORT}:${APP_PORT}
     deploy:
@@ -20,6 +20,12 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${APP_PORT}/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:latest
@@ -34,6 +40,12 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   database:

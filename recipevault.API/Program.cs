@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -23,5 +24,15 @@ app.UseSwaggerUI();
 // }
 
 app.UseHttpsRedirection();
+
+// Apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<AppDBContext>();
+    dbContext.Database.Migrate();
+}
+
+app.UseHealthChecks("/health");
 
 app.Run();

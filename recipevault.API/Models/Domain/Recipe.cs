@@ -1,7 +1,11 @@
+using recipevault.API.Interfaces;
+
 namespace recipevault.API.Models.Domain
 {
-    public class Recipe
+    public class Recipe : ITimestampable
     {
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
@@ -10,7 +14,7 @@ namespace recipevault.API.Models.Domain
         public string ImageUrl { get; set; }
 
         public int UserId { get; set; } // Foreign Key for the owner of the recipe
-        public User Owner { get; set; } // Navigation Property - Recipe has one owner
+        public User User { get; set; } // Navigation Property - Recipe has one owner
         public ICollection<User> FavouritedBy { get; set; }
 
 
