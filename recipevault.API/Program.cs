@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using recipevault.API.Data;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +13,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString("DefaultConnection"), name: "PostgreSQL");
+builder.Services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."), name: "PostgreSQL");
 
 var app = builder.Build();
 
