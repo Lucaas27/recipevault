@@ -10,8 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsHistoryTable("_EfMigrations", configuration.GetSection("Schema").GetSection("dbo").Value));
-
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 });
 
 var app = builder.Build();

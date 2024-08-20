@@ -18,6 +18,8 @@ namespace recipevault.API.Models.Domain
         public Category Category { get; set; } // Recipe has one category
 
         public ICollection<Ingredient> Ingredients { get; set; }
+        public ICollection<Rating> Ratings { get; set; }
+
 
     }
 }

@@ -9,6 +9,6 @@ namespace recipevault.API.Models.Domain
 
         // Navigation property
         public Recipe Recipe { get; set; }
-        public Recipe Owner { get; set; }
+        public User Owner { get; set; }
     }
 }

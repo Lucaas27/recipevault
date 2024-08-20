@@ -12,5 +12,6 @@ namespace recipevault.API.Models.Domain
         public User User { get; set; }
         public Recipe Recipe { get; set; }
 
+
     }
 }
