@@ -48,6 +48,20 @@ services:
       retries: 3
       start_period: 30s
 
+  migrations:
+    build:
+      context: .
+      dockerfile: recipevault.API/Dockerfile
+      target: build
+    command: ['dotnet', 'ef', 'database', 'update']
+    restart: no
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${DB_NAME:-recipevault};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:latest
     environment:

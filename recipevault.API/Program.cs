@@ -26,13 +26,6 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// Apply migrations
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<AppDBContext>();
-    dbContext.Database.Migrate();
-}
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {

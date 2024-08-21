@@ -7,25 +7,40 @@ services:
       dockerfile: recipevault.API/Dockerfile
       target: final
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:${APP_PORT}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=http://+:${PORT}
       - ConnectionStrings__DefaultConnection=Host=${DB_HOST};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - ${PORT}:${PORT}
+    restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '0.50'
           memory: 512M
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:${APP_PORT}/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:${PORT}/health']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  migrations:
+    build:
+      context: .
+      dockerfile: recipevault.API/Dockerfile
+      target: build
+    command: ['dotnet', 'ef', 'database', 'update']
+    restart: no
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=${DB_HOST};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:latest
@@ -35,6 +50,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - database:/var/lib/postgresql/data
+    restart: unless-stopped
     deploy:
       resources:
         limits:
