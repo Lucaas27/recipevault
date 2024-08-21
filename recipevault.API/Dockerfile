@@ -15,7 +15,8 @@ RUN dotnet restore "recipevault.API/recipevault.API.csproj"
 COPY . .
 WORKDIR "/src/recipevault.API"
 # Add dotnet tools to the path
-ENV PATH="$PATH:/root/.dotnet/tools"
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet build "recipevault.API.csproj" -c $configuration -o /app/build
 
 
