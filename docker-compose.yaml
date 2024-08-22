@@ -7,12 +7,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ASPNETCORE_URLS=http://+:${APP_PORT}
-      - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
-    depends_on:
-      db:
-        condition: service_healthy
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - '${APP_PORT}:${APP_PORT}'
     restart: unless-stopped
     deploy:
       resources:
@@ -25,6 +22,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - migrations
 
   migrations:
     build:
@@ -35,50 +34,7 @@ services:
     restart: no
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Timeout=15;CommandTimeout=15; Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionIdleLifetime=300;ConnectionPruningInterval=10; Trust Server Certificate=true
-    depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - recipevault_db:/var/lib/postgresql/data
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    ports:
-      - ${PGADMIN_PORT}:80
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
 
 volumes:
   recipevault_db:
